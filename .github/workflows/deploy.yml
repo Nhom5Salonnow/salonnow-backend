@@ -1,0 +1,71 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+      
+      - name: Install rsync
+        run: sudo apt-get install -y rsync
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.VPS_SSH_KEY }}
+          known_hosts: 'placeholder' # This name is just a placeholder, the next step adds the real one
+      
+      - name: Add host to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Sync Files to VPS
+        run: |
+          rsync -avz --delete --mkpath ./dist ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.APP_DIRECTORY }}/
+          rsync -avz --delete --mkpath ./scripts ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.APP_DIRECTORY }}/
+          
+          rsync -avz --mkpath ./package.json ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.APP_DIRECTORY }}/
+          rsync -avz --mkpath ./package-lock.json ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.APP_DIRECTORY }}/
+          rsync -avz --mkpath ./ecosystem.config.js ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.APP_DIRECTORY }}/
+          rsync -avz --mkpath ./.env.example ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.APP_DIRECTORY }}/
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+
+          script: |
+            cd ${{ secrets.APP_DIRECTORY }}
+
+            if [ ! -f ./.env ]; then
+              echo "Copying from .env.example to .env."
+              cp ./.env.example ./.env
+            else
+              echo ".env file already exists."
+            fi
+
+            npm ci --omit=dev
+            (pm2 describe demo-backend || true) | grep -q "status.*online" && pm2 reload demo-backend || echo "Done."
