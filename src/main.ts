@@ -62,6 +62,7 @@ async function bootstrap() {
     .setDescription('API documentation for Mobile Application Development demo')
     .setVersion('1.0')
     .addTag('user')
+    .addTag('salon')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
