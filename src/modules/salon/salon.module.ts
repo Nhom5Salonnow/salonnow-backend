@@ -1,10 +1,15 @@
 import { Module } from '@nestjs/common';
-import { OrmModule } from '../orm.module';
 import { SalonController } from './salon.controller';
+import { MikroOrmModule } from '@mikro-orm/nestjs'; // <-- 1. Import MikroOrmModule
+import { Salon } from '../../entities/Salon'; // <-- 2. Import entity của bạn
+import { SalonService } from './salon.service'; // <-- 3. Import service của bạn
 
 @Module({
-  imports: [OrmModule],
+  imports: [
+    MikroOrmModule.forFeature([Salon]), // <-- 4. Đăng ký entity
+    // OrmModule KHÔNG nên được import ở đây
+  ],
   controllers: [SalonController],
-  providers: [],
+  providers: [SalonService], // <-- 5. Cung cấp service
 })
 export class SalonModule {}
