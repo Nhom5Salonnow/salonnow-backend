@@ -8,6 +8,7 @@ import { UpdateSalonDto } from './dto/update-salon.dto';
 import { SalonResponseDto } from './dto/salon-response.dto';
 
 @Controller('salon')
+@ApiTags('salon')
 export class SalonController {
   constructor(
     @InjectRepository(Salon) private readonly SalonRepository: EntityRepository<Salon>,
