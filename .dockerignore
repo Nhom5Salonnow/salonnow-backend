@@ -4,4 +4,6 @@ dist
 .gitignore
 Dockerfile
 README.md
+.env
 npm-debug.log
+.DS_Store

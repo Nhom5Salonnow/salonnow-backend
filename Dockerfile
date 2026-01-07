@@ -1,38 +1,14 @@
-version: '3.8'
-
-services:
-
-  api:
-    build: .
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      - DATABASE_HOST=postgres_db
-      - REDIS_HOST=redis_db
-      - DATABASE_USER=myuser
-      - DATABASE_PASSWORD=mypassword
-      - DATABASE_NAME=salon_db
-    depends_on:
-      - postgres_db
-      - redis_db
-
-  postgres_db:
-    image: postgres:16
-    restart: always
-    environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-      POSTGRES_DB: salon_db
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  redis_db:
-    image: redis:alpine
-    restart: always
-    volumes:
-      - redisdata:/data
-
-volumes:
-  pgdata:
-  redisdata:
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+FROM node:18-alpine AS runner
+ENV NODE_ENV=production
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --only=production
+COPY --from=builder /app/dist ./dist
+EXPOSE 3000
+CMD ["node", "dist/main"]
