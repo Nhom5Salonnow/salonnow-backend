@@ -28,18 +28,25 @@ export class UserService {
     return this.userRepository.find();
   }
 
-  async findOne(id: string): Promise<User> {
+  async findOne(id: number): Promise<User> {
     const user = await this.userRepository.findOneBy({ id });
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
 
-  async upadateUser(id: string, updateUserDto: any): Promise<User> {
+  async upadateUser(id: number, updateUserDto: any): Promise<User> {
     await this.userRepository.update(id, updateUserDto);
     return this.findOne(id);
   }
 
   async remove(id: string): Promise<void> {
     await this.userRepository.softDelete(id);
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({
+      where: { email },
+      select: ['id', 'email', 'password', 'role', 'fullName'],
+    });
   }
 }

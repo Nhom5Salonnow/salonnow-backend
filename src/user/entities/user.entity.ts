@@ -7,6 +7,7 @@ import {
   OneToMany,
   DeleteDateColumn,
 } from 'typeorm';
+import { Salon } from '../../salon/entities/salon.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -17,7 +18,7 @@ export enum UserRole {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: number;
 
   @Column({ unique: true })
   email: string;
@@ -42,6 +43,9 @@ export class User {
   role: UserRole;
   @Column({ name: 'fcm_token', nullable: true })
   fcmToken: string;
+
+  @OneToMany(() => Salon, (salon) => salon.owner)
+  salons: Salon[];
 
   /*
   @OneToMany(() => Booking, (booking) => booking.user)
