@@ -13,6 +13,7 @@ services:
       - DATABASE_USER=myuser
       - DATABASE_PASSWORD=mypassword
       - DATABASE_NAME=salon_db
+      - JWT_SECRET=6OZ0+r/n6/G92QF7+Sx2pj4E2g+bHiGlQbKjNSrh3WE=
     depends_on:
       - postgres_db
       - redis_db
