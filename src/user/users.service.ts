@@ -5,6 +5,7 @@ import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
@@ -71,7 +72,7 @@ export class UserService {
     return results;
   }
 
-  async updateRole(userId: string, newRole: string): Promise<void> {
+  async updateRole(userId: string, newRole: UserRole): Promise<void> {
     await this.userRepository.update(userId, { role: newRole });
   }
 }

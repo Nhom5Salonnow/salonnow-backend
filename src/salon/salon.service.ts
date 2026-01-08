@@ -8,8 +8,8 @@ import { ILike, Repository } from 'typeorm';
 import { Salon } from './entities/salon.entity';
 import { CreateSalonDto } from './dto/create-salon.dto';
 import { UpdateSalonDto } from './dto/update-salon.dto';
-import { UserService } from '../user/users.service'; // 👈 1. Import UserService
-
+import { UserService } from '../user/users.service';
+import { UserRole } from '../user/entities/user.entity';
 @Injectable()
 export class SalonService {
   constructor(
@@ -28,7 +28,7 @@ export class SalonService {
 
     const savedSalon = await this.salonRepository.save(newSalon);
 
-    await this.userService.updateRole(userId, 'OWNER');
+    await this.userService.updateRole(userId, UserRole.SALON_OWNER);
 
     return savedSalon;
   }
