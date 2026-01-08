@@ -22,7 +22,7 @@ export class UserController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
   }
 
@@ -32,7 +32,7 @@ export class UserController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: number, @Body() body: any) {
+  update(@Param('id') id: string, @Body() body: any) {
     return this.userService.upadateUser(id, body);
   }
 

@@ -42,7 +42,7 @@ export class SalonController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get 1 salon detail' })
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id') id: string) {
     return this.salonService.findOne(id);
   }
 
@@ -67,7 +67,7 @@ export class SalonController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   update(
-    @Param('id') id: number,
+    @Param('id') id: string,
     @Body() updateSalonDto: UpdateSalonDto,
     @Req() req: any,
   ) {
@@ -78,7 +78,7 @@ export class SalonController {
   @ApiOperation({ summary: 'Delete Salon (owner only)' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
-  remove(@Param('id') id: number, @Req() req: any): Promise<void> {
+  remove(@Param('id') id: string, @Req() req: any): Promise<void> {
     return this.salonService.delete(id, req.user);
   }
 }

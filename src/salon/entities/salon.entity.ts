@@ -6,16 +6,18 @@ import {
   UpdateDateColumn,
   ManyToOne,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { Booking } from '../../booking/entities/booking.entity';
 
 @Entity('salons')
 export class Salon {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
-  owner_id: number;
+  owner_id: string;
 
   @Column()
   name: string;
@@ -34,4 +36,7 @@ export class Salon {
 
   @ManyToOne('User', 'salons')
   owner: User;
+
+  @OneToMany(() => Booking, (booking) => booking.salon)
+  bookings: Booking[];
 }

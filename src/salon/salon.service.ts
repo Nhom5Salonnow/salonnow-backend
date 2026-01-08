@@ -39,7 +39,7 @@ export class SalonService {
       relations: ['owner'],
     });
   }
-  async findOne(id: number): Promise<Salon> {
+  async findOne(id: string): Promise<Salon> {
     const salon = await this.salonRepository.findOne({
       where: { id },
       relations: ['owner', 'services'],
@@ -51,7 +51,7 @@ export class SalonService {
   }
 
   async update(
-    id: number,
+    id: string,
     updateSalonDto: UpdateSalonDto,
     userRequesting: User,
   ): Promise<Salon> {
@@ -65,7 +65,7 @@ export class SalonService {
     return await this.salonRepository.save(salon);
   }
 
-  async delete(id: number, userRequesting: User): Promise<void> {
+  async delete(id: string, userRequesting: User): Promise<void> {
     const salon = await this.findOne(id);
     if (salon.owner.id !== userRequesting.id) {
       throw new ForbiddenException('You are not the owner of this salon');
@@ -73,7 +73,7 @@ export class SalonService {
     await this.salonRepository.softDelete(id);
   }
 
-  async findMySalons(ownerId: number): Promise<Salon[]> {
+  async findMySalons(ownerId: string): Promise<Salon[]> {
     return await this.salonRepository.find({
       where: { owner: { id: ownerId } },
       relations: ['services'],

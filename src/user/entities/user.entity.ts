@@ -8,6 +8,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { Salon } from '../../salon/entities/salon.entity';
+import { Booking } from '../../booking/entities/booking.entity';
 
 export enum UserRole {
   CLIENT = 'CLIENT',
@@ -18,7 +19,7 @@ export enum UserRole {
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: number;
+  id: string;
 
   @Column({ unique: true })
   email: string;
@@ -69,4 +70,7 @@ export class User {
   // Soft Delete
   @DeleteDateColumn()
   deletedAt: Date;
+
+  @OneToMany(() => Booking, (booking) => booking.customer)
+  bookings: Booking[];
 }
