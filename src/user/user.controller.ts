@@ -11,13 +11,20 @@ import {
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags } from '@nestjs/swagger';
-
+import { ApiTags, ApiBody } from '@nestjs/swagger';
 
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+  @Post('bulk')
+  @ApiBody({ type: [CreateUserDto] })
+  async createBulk(
+    @Body(new ParseArrayPipe({ items: CreateUserDto, whitelist: true }))
+    users: CreateUserDto[],
+  ) {
+    return this.userService.createMany(users);
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
@@ -42,13 +49,5 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
-  }
-
-  @Post('bulk')
-  async createBulk(
-    @Body(new ParseArrayPipe({ items: CreateUserDto })) // Validate từng phần tử trong mảng
-    users: CreateUserDto[],
-  ) {
-    return this.userService.createMany(users);
   }
 }
