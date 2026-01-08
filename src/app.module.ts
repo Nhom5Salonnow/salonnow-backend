@@ -11,6 +11,7 @@ import { SalonModule } from './salon/salon.module';
 import { AuthModule } from './auth/auth.module';
 import { BookingModule } from './booking/booking.module';
 import { ServiceModule } from './service/service.module';
+import { WaitlistModule } from './waitlist/waitlist.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ServiceModule } from './service/service.module';
     AuthModule, // Quản lý đăng nhập/Token
     BookingModule,
     ServiceModule,
+    WaitlistModule,
   ],
   controllers: [AppController],
   providers: [AppService],
