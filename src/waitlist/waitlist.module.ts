@@ -8,5 +8,6 @@ import { Waitlist } from './entities/waitlist.entity';
   imports: [TypeOrmModule.forFeature([Waitlist])], // 👈 Đừng quên dòng này
   controllers: [WaitlistController],
   providers: [WaitlistService],
+  exports: [WaitlistService],
 })
 export class WaitlistModule {}
