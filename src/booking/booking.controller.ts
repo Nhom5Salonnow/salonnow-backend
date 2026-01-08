@@ -1,8 +1,17 @@
-import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  Get,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Bookings')
 @Controller('bookings')
@@ -19,5 +28,12 @@ export class BookingController {
   @Get('my-bookings')
   findMyBookings(@Req() req: any) {
     return this.bookingService.findMyBookings(req.user.id);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Hủy lịch đặt (Sẽ kích hoạt Waitlist)' })
+  cancel(@Param('id') id: string, @Req() req: any) {
+    // Truyền cả ID booking và ID user (để kiểm tra xem có đúng chính chủ đang hủy không)
+    return this.bookingService.cancel(id, req.user.id);
   }
 }

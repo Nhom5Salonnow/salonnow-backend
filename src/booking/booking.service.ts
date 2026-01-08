@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking, BookingStatus } from './entities/booking.entity';
@@ -36,14 +40,22 @@ export class BookingService {
   async cancel(id: string, userId: string) {
     const booking = await this.bookingRepository.findOne({
       where: { id },
-      relations: ['salon', 'service'], // 👈 Phải load relation để Waitlist biết salon/service nào
+      relations: ['salon', 'service', 'customer'],
     });
 
-    if (!booking) throw new NotFoundException('Booking not found');
+    if (!booking) {
+      throw new NotFoundException('Booking not found');
+    }
 
-    // Cập nhật trạng thái hủy
+    if (booking.customer.id !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to cancel this booking',
+      );
+    }
+
     booking.status = BookingStatus.CANCELLED;
     await this.bookingRepository.save(booking);
+
     this.waitlistService
       .processEmptySlot(booking)
       .catch((err) => console.error(err));
