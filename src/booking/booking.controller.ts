@@ -1,25 +1,23 @@
-import { Controller, Post, Body, Get, Req, UseGuards } from '@nestjs/common';
-import { BookingsService } from './booking.service';
+import { Controller, Post, Body, UseGuards, Req, Get } from '@nestjs/common';
+import { BookingService } from './booking.service';
 import { CreateBookingDto } from './dto/create-booking.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Bookings')
-@ApiBearerAuth()
-@UseGuards(AuthGuard('jwt'))
 @Controller('bookings')
-export class BookingsController {
-  constructor(private readonly bookingsService: BookingsService) {}
+@ApiBearerAuth()
+@UseGuards(AuthGuard('jwt')) // Bắt buộc đăng nhập mới được đặt lịch
+export class BookingController {
+  constructor(private readonly bookingService: BookingService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Đặt lịch mới' })
   create(@Body() createBookingDto: CreateBookingDto, @Req() req: any) {
-    return this.bookingsService.create(createBookingDto, req.user);
+    return this.bookingService.create(req.user.id, createBookingDto);
   }
 
   @Get('my-bookings')
-  @ApiOperation({ summary: 'Xem lịch sử đặt chỗ của tôi' })
   findMyBookings(@Req() req: any) {
-    return this.bookingsService.findMyBookings(req.user.id);
+    return this.bookingService.findMyBookings(req.user.id);
   }
 }

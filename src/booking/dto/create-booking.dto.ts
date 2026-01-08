@@ -1,19 +1,22 @@
-import { IsNotEmpty, IsDateString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsISO8601, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBookingDto {
-  @ApiProperty({ example: 'uuid of salon' })
+  @ApiProperty({ example: 'uuid-cua-salon' })
   @IsNotEmpty()
   @IsUUID()
   salonId: string;
 
-  @ApiProperty({ example: '2026-01-08T09:00:00.000Z' })
+  @ApiProperty({ example: 'uuid-cua-dich-vu' })
   @IsNotEmpty()
-  @IsDateString()
-  startTime: string;
+  @IsUUID()
+  serviceId: string;
 
-  @ApiProperty({ example: '2026-01-08T10:00:00.000Z' })
+  @ApiProperty({
+    example: '2026-01-10T09:00:00Z',
+    description: 'ISO 8601 Date format',
+  })
   @IsNotEmpty()
-  @IsDateString()
-  endTime: string;
+  @IsISO8601()
+  startTime: string;
 }

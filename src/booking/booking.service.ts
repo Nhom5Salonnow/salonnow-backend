@@ -1,73 +1,32 @@
-import {
-  Injectable,
-  BadRequestException,
-  NotFoundException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, LessThan, MoreThan } from 'typeorm';
-import { Booking, BookingStatus } from './entities/booking.entity';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBookingDto } from './dto/create-booking.dto';
-import { User } from '../user/entities/user.entity';
-import { SalonService } from '../salon/salon.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Booking } from './entities/booking.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class BookingsService {
+export class BookingService {
   constructor(
     @InjectRepository(Booking)
     private bookingRepository: Repository<Booking>,
-    private salonsService: SalonService,
   ) {}
 
-  async create(
-    createBookingDto: CreateBookingDto,
-    customer: User,
-  ): Promise<Booking> {
-    const { salonId, startTime, endTime } = createBookingDto;
-    const start = new Date(startTime);
-    const end = new Date(endTime);
-
-    if (start >= end) {
-      throw new BadRequestException(
-        'Thời gian kết thúc phải sau thời gian bắt đầu',
-      );
-    }
-    if (start < new Date()) {
-      throw new BadRequestException('Không thể đặt lịch trong quá khứ');
-    }
-
-    const salon = await this.salonsService.findOne(salonId);
-    if (!salon) throw new NotFoundException('Salon không tồn tại');
-
-    const existingBooking = await this.bookingRepository.findOne({
-      where: {
-        salon: { id: salonId },
-        status: BookingStatus.CONFIRMED,
-        // (StartA < EndB) AND (EndA > StartB)
-        startTime: LessThan(end),
-        endTime: MoreThan(start),
-      },
+  async create(userId: string, createBookingDto: CreateBookingDto) {
+    const newBooking = this.bookingRepository.create({
+      startTime: createBookingDto.startTime,
+      customer: { id: userId }, // Gán ID khách hàng
+      salon: { id: createBookingDto.salonId }, // Gán ID Salon
+      service: { id: createBookingDto.serviceId }, // Gán ID Dịch vụ
     });
 
-    if (existingBooking) {
-      throw new BadRequestException('Khung giờ này đã có người đặt!');
-    }
-
-    const booking = this.bookingRepository.create({
-      startTime: start,
-      endTime: end,
-      salon: salon, //  object Salon
-      customer: customer, //  object User
-      status: BookingStatus.PENDING,
-    });
-
-    return await this.bookingRepository.save(booking);
+    return await this.bookingRepository.save(newBooking);
   }
 
-  // get booking history
+  // Lấy booking của tôi (Dành cho Client xem lịch sử)
   async findMyBookings(userId: string) {
     return await this.bookingRepository.find({
       where: { customer: { id: userId } },
-      relations: ['salon'],
+      relations: ['salon', 'service'],
       order: { startTime: 'DESC' },
     });
   }
