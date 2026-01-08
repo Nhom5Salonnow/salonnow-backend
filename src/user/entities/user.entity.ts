@@ -7,6 +7,7 @@ import {
   OneToMany,
   DeleteDateColumn,
 } from 'typeorm';
+// 👇 Kiểm tra lại đường dẫn thư mục của bạn (salon hay salons)
 import { Salon } from '../../salon/entities/salon.entity';
 import { Booking } from '../../booking/entities/booking.entity';
 
@@ -28,7 +29,10 @@ export class User {
   password: string;
 
   @Column()
-  fullName: string;
+  firstName: string;
+
+  @Column()
+  lastName: string;
 
   @Column({ nullable: true })
   phoneNumber: string;
@@ -42,24 +46,19 @@ export class User {
     default: UserRole.CLIENT,
   })
   role: UserRole;
+
   @Column({ name: 'fcm_token', nullable: true })
   fcmToken: string;
+
 
   @OneToMany(() => Salon, (salon) => salon.owner)
   salons: Salon[];
 
-  /*
-  @OneToMany(() => Booking, (booking) => booking.user)
+
+  @OneToMany(() => Booking, (booking) => booking.customer)
   bookings: Booking[];
 
-  @OneToMany(() => Salon, (salon) => salon.owner)
-  ownedSalons: Salon[];
 
-  @OneToMany(() => Waitlist, (waitlist) => waitlist.user)
-  waitlistItems: Waitlist[];
-  */
-
-  // --- TIMESTAMPS ---
 
   @CreateDateColumn()
   createdAt: Date;
@@ -67,10 +66,7 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  // Soft Delete
+  // Soft Delete (Xóa mềm)
   @DeleteDateColumn()
   deletedAt: Date;
-
-  @OneToMany(() => Booking, (booking) => booking.customer)
-  bookings: Booking[];
 }
