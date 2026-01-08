@@ -36,6 +36,10 @@ export class UserService {
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    // Sửa logic update một chút để an toàn hơn:
+    // Check xem user có tồn tại không trước khi update
+    await this.findOne(id);
+
     await this.userRepository.update(id, updateUserDto);
     return this.findOne(id);
   }
@@ -52,7 +56,7 @@ export class UserService {
   }
 
   async createMany(usersData: CreateUserDto[]) {
-    const results = [];
+    const results: any[] = [];
 
     for (const user of usersData) {
       try {

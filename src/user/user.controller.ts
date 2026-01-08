@@ -17,6 +17,7 @@ import { ApiTags, ApiBody } from '@nestjs/swagger';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
   @Post('bulk')
   @ApiBody({ type: [CreateUserDto] })
   async createBulk(
