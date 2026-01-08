@@ -1,7 +1,15 @@
-import { Controller, Get, Patch, Param, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Delete,
+  Param,
+  UseGuards,
+  Req,
+} from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiBearerAuth, ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('Notifications')
 @ApiBearerAuth()
@@ -16,9 +24,29 @@ export class NotificationController {
     return this.notificationService.getMyNotifications(req.user.id);
   }
 
+  @Get('unread-count')
+  @ApiOperation({ summary: 'Lấy số thông báo chưa đọc' })
+  getUnreadCount(@Req() req: any) {
+    return this.notificationService.getUnreadCount(req.user.id);
+  }
+
+  @Patch('read-all')
+  @ApiOperation({ summary: 'Đánh dấu tất cả đã đọc' })
+  markAllAsRead(@Req() req: any) {
+    return this.notificationService.markAllAsRead(req.user.id);
+  }
+
   @Patch(':id/read')
   @ApiOperation({ summary: 'Đánh dấu đã đọc' })
-  markAsRead(@Param('id') id: string) {
-    return this.notificationService.markAsRead(id);
+  @ApiParam({ name: 'id', description: 'ID của notification' })
+  markAsRead(@Param('id') id: string, @Req() req: any) {
+    return this.notificationService.markAsRead(id, req.user.id);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Xóa thông báo' })
+  @ApiParam({ name: 'id', description: 'ID của notification' })
+  delete(@Param('id') id: string, @Req() req: any) {
+    return this.notificationService.delete(id, req.user.id);
   }
 }

@@ -50,6 +50,14 @@ export class User {
   @Column({ name: 'fcm_token', nullable: true })
   fcmToken: string;
 
+  @Column({ name: 'refresh_token', type: 'varchar', nullable: true, select: false })
+  refreshToken: string;
+
+  @Column({ name: 'password_reset_token', type: 'varchar', nullable: true, select: false })
+  passwordResetToken: string;
+
+  @Column({ name: 'password_reset_expires', type: 'timestamp', nullable: true })
+  passwordResetExpires: Date;
 
   @OneToMany(() => Salon, (salon) => salon.owner)
   salons: Salon[];

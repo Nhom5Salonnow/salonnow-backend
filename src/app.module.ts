@@ -13,6 +13,11 @@ import { BookingModule } from './booking/booking.module';
 import { ServiceModule } from './service/service.module';
 import { WaitlistModule } from './waitlist/waitlist.module';
 import { NotificationModule } from './notification/notification.module';
+import { PaymentModule } from './payment/payment.module';
+import { ReviewModule } from './review/review.module';
+import { StylistModule } from './stylist/stylist.module';
+import { CategoryModule } from './category/category.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -23,7 +28,7 @@ import { NotificationModule } from './notification/notification.module';
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DATABASE_HOST || 'postgres_db',
-      port: 5432,
+      port: parseInt(process.env.DATABASE_PORT || '5432'),
       username: process.env.DATABASE_USER || 'myuser',
       password: process.env.DATABASE_PASSWORD || 'mypassword',
       database: process.env.DATABASE_NAME || 'salon_db',
@@ -40,6 +45,11 @@ import { NotificationModule } from './notification/notification.module';
     ServiceModule,
     WaitlistModule,
     NotificationModule,
+    PaymentModule,
+    ReviewModule,
+    StylistModule,
+    CategoryModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
