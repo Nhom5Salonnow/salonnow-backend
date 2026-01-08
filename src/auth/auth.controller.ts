@@ -1,19 +1,7 @@
-import {
-  Controller,
-  Post,
-  Body,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, UseGuards, Request, Body } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-
-
-class LoginDto {
-  email: string;
-  pass: string;
-}
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -23,12 +11,16 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   @Post('login')
   @ApiOperation({ summary: 'Đăng nhập lấy Token' })
-  async login(@Body() req: LoginDto) {
-    const user = await this.authService.validateUser(req.email, req.pass);
-    if (!user) {
-      throw new UnauthorizedException('Sai email hoặc mật khẩu');
-    }
-
-    return this.authService.login(user);
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        email: { type: 'string', example: 'tran.thi.b@example.com' },
+        password: { type: 'string', example: 'SecurePass456!' },
+      },
+    },
+  })
+  async login(@Request() req) {
+    return this.authService.login(req.user);
   }
 }
