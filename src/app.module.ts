@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { BookingModule } from './booking/booking.module';
 import { ServiceModule } from './service/service.module';
 import { WaitlistModule } from './waitlist/waitlist.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { WaitlistModule } from './waitlist/waitlist.module';
     BookingModule,
     ServiceModule,
     WaitlistModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
