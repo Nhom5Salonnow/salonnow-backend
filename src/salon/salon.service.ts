@@ -7,26 +7,34 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ILike, Repository } from 'typeorm';
 import { Salon } from './entities/salon.entity';
 import { CreateSalonDto } from './dto/create-salon.dto';
-import { User } from '../user/entities/user.entity';
 import { UpdateSalonDto } from './dto/update-salon.dto';
+import { UserService } from '../user/users.service'; // 👈 1. Import UserService
 
 @Injectable()
 export class SalonService {
   constructor(
     @InjectRepository(Salon)
     private readonly salonRepository: Repository<Salon>,
+    private readonly userService: UserService,
   ) {}
 
-  async create(createSalonDto: CreateSalonDto, owner: User): Promise<Salon> {
+  // 3. Logic Tạo Salon + Nâng cấp User
+  async create(userId: string, createSalonDto: CreateSalonDto): Promise<Salon> {
     const newSalon = this.salonRepository.create({
       ...createSalonDto,
-      owner: owner,
+
+      owner: { id: userId },
     });
-    return await this.salonRepository.save(newSalon);
+
+    const savedSalon = await this.salonRepository.save(newSalon);
+
+    await this.userService.updateRole(userId, 'OWNER');
+
+    return savedSalon;
   }
 
   async findAll(keyword?: string): Promise<Salon[]> {
-    if (!keyword) {
+    if (keyword) {
       return await this.salonRepository.find({
         where: [
           { name: ILike(`%${keyword}%`) },
@@ -35,17 +43,19 @@ export class SalonService {
         relations: ['owner'],
       });
     }
+
     return await this.salonRepository.find({
       relations: ['owner'],
     });
   }
+
   async findOne(id: string): Promise<Salon> {
     const salon = await this.salonRepository.findOne({
       where: { id },
       relations: ['owner', 'services'],
     });
     if (!salon) {
-      throw new NotFoundException('No salon with id ' + id);
+      throw new NotFoundException('Salon not found with id: ' + id);
     }
     return salon;
   }
@@ -53,11 +63,11 @@ export class SalonService {
   async update(
     id: string,
     updateSalonDto: UpdateSalonDto,
-    userRequesting: User,
+    userId: string,
   ): Promise<Salon> {
     const salon = await this.findOne(id);
 
-    if (salon.owner.id !== userRequesting.id) {
+    if (salon.owner.id !== userId) {
       throw new ForbiddenException('You are not the owner of this salon');
     }
 
@@ -65,11 +75,13 @@ export class SalonService {
     return await this.salonRepository.save(salon);
   }
 
-  async delete(id: string, userRequesting: User): Promise<void> {
+  async delete(id: string, userId: string): Promise<void> {
     const salon = await this.findOne(id);
-    if (salon.owner.id !== userRequesting.id) {
+
+    if (salon.owner.id !== userId) {
       throw new ForbiddenException('You are not the owner of this salon');
     }
+
     await this.salonRepository.softDelete(id);
   }
 
@@ -79,5 +91,4 @@ export class SalonService {
       relations: ['services'],
     });
   }
-
 }

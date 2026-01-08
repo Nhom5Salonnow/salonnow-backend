@@ -9,7 +9,6 @@ import {
   Query,
   Req,
   UseGuards,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { SalonService } from './salon.service';
 import { Salon } from './entities/salon.entity';
@@ -23,14 +22,13 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-
 @ApiTags('Salons')
 @Controller('salons')
 export class SalonController {
   constructor(private readonly salonService: SalonService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get Salons list' })
+  @ApiOperation({ summary: 'Get Salons list (Search by name/address)' })
   @ApiQuery({
     name: 'keyword',
     required: false,
@@ -40,6 +38,15 @@ export class SalonController {
     return this.salonService.findAll(keywords);
   }
 
+  @Get('my-salons')
+  @ApiOperation({ summary: 'Get list of salons owned by me' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'))
+  findMySalons(@Req() req: any) {
+    // Truyền userId vào service
+    return this.salonService.findMySalons(req.user.id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get 1 salon detail' })
   findOne(@Param('id') id: string) {
@@ -47,23 +54,16 @@ export class SalonController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create Salon' })
+  @ApiOperation({ summary: 'Create Salon (Auto upgrade user to OWNER)' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   async create(@Body() createSalonDto: CreateSalonDto, @Req() req: any) {
-    return this.salonService.create(createSalonDto, req);
-  }
-
-  @Get('my-salons')
-  @ApiOperation({ summary: 'Get my salon list' })
-  @ApiBearerAuth()
-  @UseGuards(AuthGuard('jwt'))
-  findMySalons(@Req() req: any) {
-    return this.salonService.findMySalons(req);
+    // Truyền userId và DTO vào service
+    return this.salonService.create(req.user.id, createSalonDto);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update Salon (owner only' })
+  @ApiOperation({ summary: 'Update Salon (Owner only)' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   update(
@@ -71,14 +71,14 @@ export class SalonController {
     @Body() updateSalonDto: UpdateSalonDto,
     @Req() req: any,
   ) {
-    return this.salonService.update(id, updateSalonDto, req);
+    return this.salonService.update(id, updateSalonDto, req.user.id);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete Salon (owner only)' })
+  @ApiOperation({ summary: 'Delete Salon (Owner only)' })
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   remove(@Param('id') id: string, @Req() req: any): Promise<void> {
-    return this.salonService.delete(id, req.user);
+    return this.salonService.delete(id, req.user.id);
   }
 }

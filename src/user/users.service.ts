@@ -70,4 +70,8 @@ export class UserService {
 
     return results;
   }
+
+  async updateRole(userId: string, newRole: string): Promise<void> {
+    await this.userRepository.update(userId, { role: newRole });
+  }
 }
