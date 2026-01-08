@@ -10,6 +10,7 @@ import { UsersModule } from './user/user.module';
 import { SalonModule } from './salon/salon.module';
 import { AuthModule } from './auth/auth.module';
 import { BookingsModule } from './booking/booking.module';
+import { ServiceModule } from './service/service.module';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { BookingsModule } from './booking/booking.module';
     UsersModule, // Quản lý người dùng
     SalonModule, // Quản lý tiệm (Khắc phục lỗi User#salons not found)
     AuthModule, // Quản lý đăng nhập/Token
-    BookingsModule,
+    BookingsModule, ServiceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Booking } from '../../booking/entities/booking.entity';
-// import { Service } from '../../service/entities/service.entity';
+import { Service } from '../../service/entities/service.entity';
 
 @Entity('salons')
 export class Salon {
@@ -36,6 +36,9 @@ export class Salon {
   @ManyToOne(() => User, (user) => user.salons, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'owner_id' }) // 👈 Map cột này vào owner_id trong DB
   owner: User;
+
+  @OneToMany(() => Service, (service) => service.salon)
+  services: Service[];
 
   @OneToMany(() => Booking, (booking) => booking.salon)
   bookings: Booking[];
