@@ -6,11 +6,13 @@ import {
   Param,
   Delete,
   Patch,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import { UserService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
+
 
 @ApiTags('Users')
 @Controller('users')
@@ -40,5 +42,13 @@ export class UserController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userService.remove(id);
+  }
+
+  @Post('bulk')
+  async createBulk(
+    @Body(new ParseArrayPipe({ items: CreateUserDto })) // Validate từng phần tử trong mảng
+    users: CreateUserDto[],
+  ) {
+    return this.userService.createMany(users);
   }
 }

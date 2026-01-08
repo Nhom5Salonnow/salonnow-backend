@@ -50,4 +50,20 @@ export class UserService {
       select: ['id', 'email', 'password', 'role', 'firstName', 'lastName'],
     });
   }
+
+  async createMany(usersData: CreateUserDto[]) {
+    const results = [];
+
+    for (const user of usersData) {
+      try {
+        const newUser = await this.createUser(user);
+        results.push(newUser);
+      } catch (error) {
+        console.error(`Lỗi khi tạo user ${user.email}:`, error.message);
+        results.push({ email: user.email, error: error.message });
+      }
+    }
+
+    return results;
+  }
 }
