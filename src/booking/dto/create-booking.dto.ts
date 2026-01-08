@@ -1,5 +1,5 @@
-import { IsNotEmpty, IsISO8601, IsUUID } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsISO8601, IsUUID, IsOptional, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateBookingDto {
   @ApiProperty({ example: 'uuid-cua-salon' })
@@ -12,6 +12,11 @@ export class CreateBookingDto {
   @IsUUID()
   serviceId: string;
 
+  @ApiPropertyOptional({ example: 'uuid-cua-stylist', description: 'ID của stylist (tùy chọn)' })
+  @IsOptional()
+  @IsUUID()
+  stylistId?: string;
+
   @ApiProperty({
     example: '2026-01-10T09:00:00Z',
     description: 'ISO 8601 Date format',
@@ -19,4 +24,9 @@ export class CreateBookingDto {
   @IsNotEmpty()
   @IsISO8601()
   startTime: string;
+
+  @ApiPropertyOptional({ example: 'Tôi muốn cắt ngắn hơn bình thường', description: 'Ghi chú cho booking' })
+  @IsOptional()
+  @IsString()
+  notes?: string;
 }

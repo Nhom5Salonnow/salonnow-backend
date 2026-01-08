@@ -33,8 +33,48 @@ export class Salon {
   @Column({ nullable: true })
   email: string;
 
+  // Logo & Gallery
+  @Column({ nullable: true })
+  logo: string;
+
+  @Column({ type: 'simple-array', nullable: true })
+  images: string[];
+
+  // Working hours
+  @Column({ name: 'open_time', nullable: true })
+  openTime: string;
+
+  @Column({ name: 'close_time', nullable: true })
+  closeTime: string;
+
+  @Column({ name: 'working_days', type: 'simple-array', nullable: true })
+  workingDays: number[];
+
+  // GPS Location
+  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  latitude: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  longitude: number;
+
+  // Rating & Stats
+  @Column({ type: 'decimal', precision: 2, scale: 1, default: 0 })
+  rating: number;
+
+  @Column({ name: 'review_count', default: 0 })
+  reviewCount: number;
+
+  @Column({ name: 'service_count', default: 0 })
+  serviceCount: number;
+
+  @Column({ name: 'stylist_count', default: 0 })
+  stylistCount: number;
+
+  @Column({ name: 'is_active', default: true })
+  isActive: boolean;
+
   @ManyToOne(() => User, (user) => user.salons, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'owner_id' }) // 👈 Map cột này vào owner_id trong DB
+  @JoinColumn({ name: 'owner_id' })
   owner: User;
 
   @OneToMany(() => Service, (service) => service.salon)
